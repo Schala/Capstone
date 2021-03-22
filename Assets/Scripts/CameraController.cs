@@ -13,7 +13,7 @@ public class CameraController : MonoBehaviour
 	Vector3 velocity = Vector3.zero;
 
 	/// <summary>
-	/// Set up our singleton instance and variables
+	/// Set up our singleton instance and variables.
 	/// </summary>
 	private void Awake()
 	{
@@ -23,7 +23,7 @@ public class CameraController : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Update the camera to follow the player consistently
+	/// Update the camera to follow the player consistently.
 	/// </summary>
 	void LateUpdate()
 	{
