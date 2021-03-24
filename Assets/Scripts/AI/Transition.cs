@@ -14,22 +14,18 @@
  * Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-using UnityEngine;
+using System;
 
-/// <summary>
-/// Heads-up display for the UI
-/// </summary>
-public class HUD : MonoBehaviour
+namespace Capstone.AI
 {
-    Camera pov = null;
-
-	/// <summary>
-	/// Identify and cache a reference to the main camera.
-	/// </summary>
-	private void Awake() => pov = Camera.main;
-
-	/// <summary>
-	/// Have the HUD always face the camera.
-	/// </summary>
-	void LateUpdate() => transform.LookAt(transform.position + pov.transform.forward);
+    /// <summary>
+    /// A transition for a State object which holds references to outcomes for the decision it references
+    /// </summary>
+    [Serializable]
+    public class Transition
+    {
+        public Decision decision;
+        public State trueState;
+        public State falseState;
+    }
 }
