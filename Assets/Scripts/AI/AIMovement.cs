@@ -64,10 +64,6 @@ namespace Capstone.AI
 		/// <summary>
 		/// Is the AI in range of the target position?
 		/// </summary>
-		public bool IsInRange(Vector3 target)
-		{
-			if (target == null) return true; // crash mitigation
-			return Vector3.Distance(transform.position, target) < epsilon;
-		}
+		public bool IsInRange(Vector3 target) => Vector3.Distance(transform.position, target) < epsilon;
 	}
 }
