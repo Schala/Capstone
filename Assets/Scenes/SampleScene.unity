@@ -135,6 +135,7 @@ GameObject:
   - component: {fileID: 194946557}
   - component: {fileID: 194946555}
   - component: {fileID: 194946558}
+  - component: {fileID: 194946559}
   m_Layer: 0
   m_Name: game manager
   m_TagString: Untagged
@@ -277,6 +278,88 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   items: []
+--- !u!114 &194946559
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 194946554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Actions: {fileID: -944628639613478452, guid: a86a033a15b6de141bc690d9ea2ee745, type: 3}
+  m_NotificationBehavior: 2
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents:
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 485e04ea-f82e-4b31-8058-6d0442af77ca
+    m_ActionName: Player/Move[/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f9c11671-11f1-48d6-aea3-edb7126e9494
+    m_ActionName: Player/Fire[/Mouse/leftButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 67293075-c112-472c-a60d-6c1062498b60
+    m_ActionName: Player/Jump[/Keyboard/space]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: ea8ab610-83eb-46c2-b8d3-fda7d25d44fc
+    m_ActionName: UI/Navigate[/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f2a70c53-0a87-4303-95bb-81c1539f0a01
+    m_ActionName: UI/Submit[/Keyboard/enter]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 674e5fd3-7817-4c9a-a761-f9de5f301eeb
+    m_ActionName: UI/Cancel[/Keyboard/escape]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 4c213ee8-ffef-4bea-807a-df4558de9f7f
+    m_ActionName: UI/Point[/Mouse/position]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 8f91445d-799a-45a7-b210-1a98629d0d9d
+    m_ActionName: UI/Click[/Mouse/leftButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 6af1a8fb-09c5-45c4-98dd-797934d528b9
+    m_ActionName: UI/ScrollWheel[/Mouse/scroll]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 53cf1c78-5924-4e27-8a3c-e0eedb60e386
+    m_ActionName: UI/MiddleClick[/Mouse/middleButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: f1b65413-16d2-47b2-9ed3-d8ea7ccfb227
+    m_ActionName: UI/RightClick[/Mouse/rightButton]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 4c998fc4-ad8d-4540-91b2-7b6fb993eec8
+    m_ActionName: UI/TrackedDevicePosition
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 6d90b369-4cf9-4330-aeeb-0e7564064ba6
+    m_ActionName: UI/TrackedDeviceOrientation
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: 
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1 &656810071
 GameObject:
   m_ObjectHideFlags: 0
@@ -473,6 +556,10 @@ MonoBehaviour:
   gravityMultiplier: -3
   forceWhenDamaged: 5
   limitedInvulnerabilityTime: 1
+  groundDistanceFactor: 0.1
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 8
   maxJumps: 2
 --- !u!1 &1517418352
 GameObject:
@@ -486,7 +573,7 @@ GameObject:
   - component: {fileID: 1517418355}
   - component: {fileID: 1517418354}
   - component: {fileID: 1517418353}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: level
   m_TagString: Ground
   m_Icon: {fileID: 0}
@@ -526,7 +613,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 41870e638d03e9144979cb6f66de5135, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
