@@ -11,7 +11,6 @@ namespace Capstone
 	{
 		static GameManager instance = null;
 		int frameRate = 0;
-		PlayerInput playerInput = null;
 
 		/// <summary>
 		/// Set up a singleton. We don't want more than one game manager instance.
@@ -22,8 +21,6 @@ namespace Capstone
 				Destroy(gameObject);
 			instance = this;
 			DontDestroyOnLoad(gameObject);
-
-			playerInput = GetComponent<PlayerInput>();
 		}
 
 		/// <summary>
@@ -32,6 +29,5 @@ namespace Capstone
 		private void Update() => frameRate = (int)(1f / Time.unscaledDeltaTime);
 
 		public static int FrameRate => instance.frameRate;
-		public static PlayerInput Input => instance.playerInput;
 	}
 }

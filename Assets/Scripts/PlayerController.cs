@@ -6,9 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace Capstone
 {
-	/// <summary>
 	/// Various states of our player
-	/// </summary>
 	[Flags]
 	public enum PlayerState : byte
 	{
@@ -19,45 +17,52 @@ namespace Capstone
 		Damaged = 8
 	}
 
-	/// <summary>
 	/// Manages player input, movement and actions
-	/// </summary>
-	[RequireComponent(typeof(CharacterController))]
-	[RequireComponent(typeof(CharacterRigidbody))]
+	[RequireComponent(typeof(Rigidbody))]
 	[RequireComponent(typeof(Material))]
 	public class PlayerController : MonoBehaviour
 	{
-		[SerializeField] float moveSpeed = 5f;
-		[SerializeField] float jumpForce = 1f;
+		[Header("Movement")]
+		[SerializeField] float moveSpeed = 25f;
+		[SerializeField] float airborneMovementDilusion = 0.25f;
+
+		[Header("Stepping")]
+		[SerializeField] Transform stepUpper = null;
+		[SerializeField] Transform stepLower = null;
+		[SerializeField] float stepLowerRayCastDistance = 0.1f;
+		[SerializeField] float stepUpperRayCastDistance = 0.2f;
+		[SerializeField] float stepSmooth = 0.1f;
+
+		[Header("Jumping")]
+		[SerializeField] float jumpForce = 5f;
 		[SerializeField] float jumpTimeFrame = 0.25f;
-		[SerializeField] float gravityMultiplier = -3f;
-		[SerializeField] float forceWhenDamaged = 5f;
-		[SerializeField] float limitedInvulnerabilityTime = 1f;
-		[SerializeField] float groundDistanceFactor = 0.01f;
-		[SerializeField] LayerMask groundMask;
 		[SerializeField] int maxJumps = 2;
 
-		CharacterController controller = null;
-		CharacterRigidbody physicsBody = null;
+		[Header("Interaction")]
+		[SerializeField] float forceWhenDamaged = 5f;
+		[SerializeField] float limitedInvulnerabilityTime = 1f;
+
+		Rigidbody physicsBody = null;
 		Material[] playerMaterials = null;
 		Color[] materialColors = null;
-		Vector3 velocity = Vector3.zero;
 		float movement = 0f;
 		float groundDelta = 0f;
 		float damagedDelta = 0f;
 		int jumpCount = 0;
 		PlayerState state = PlayerState.None;
+		PlayerInput playerInput = null;
 
 		InputAction jumpAction = null;
 		InputAction moveAction = null;
 
-		/// <summary>
-		/// Set up our input actions.
-		/// </summary>
+		/// Set up our input actions and gather material info.
 		private void Awake()
 		{
-			controller = GetComponent<CharacterController>();
-			physicsBody = GetComponent<CharacterRigidbody>();
+			physicsBody = GetComponent<Rigidbody>();
+
+			playerInput = FindObjectOfType<GameManager>().GetComponent<PlayerInput>();
+			jumpAction = playerInput.actions.FindAction("Jump");
+			moveAction = playerInput.actions.FindAction("Move");
 
 			var renderers = GetComponentsInChildren<Renderer>();
 			var playerMaterialsList = new List<Material>();
@@ -72,37 +77,43 @@ namespace Capstone
 			}
 			playerMaterials = playerMaterialsList.ToArray();
 			materialColors = materialColorsList.ToArray();
-
-			jumpAction = GameManager.Input.actions.FindAction("Jump");
-			moveAction = GameManager.Input.actions.FindAction("Move");
 		}
 
-		/// <summary>
 		/// Apply any motion specified to the player.
-		/// </summary>
-		private void Update()
+		private void FixedUpdate()
 		{
-			velocity = controller.velocity;
-
 			if (state.HasFlag(PlayerState.Moving))
-				controller.Move(Vector3.forward * movement * moveSpeed * Time.deltaTime);
+			{
+				if (state.HasFlag(PlayerState.Grounded))
+					physicsBody.AddForce(Vector3.forward * movement * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
+				else
+					physicsBody.AddForce(Vector3.forward * movement * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
+			}
 
-			// Cast a ray to check if we're on ground, otherwise apply gravity.
-			//Debug.DrawRay(transform.position, -Vector3.up * groundDistanceFactor, Color.green);
-			if (Physics.Raycast(transform.position, -Vector3.up, out RaycastHit hit, groundDistanceFactor, groundMask))
+			Climb();
+		}
+
+		/// Check to see if we're on the ground.
+		private void OnTriggerEnter(Collider other)
+		{
+			if (other.CompareTag("Ground"))
 			{
 				state |= PlayerState.Grounded;
 				jumpCount = 0;
 				groundDelta = 0f;
 			}
-			else
-			{
-				
-				state &= ~PlayerState.Grounded;
-				velocity.y += Physics.gravity.y * Time.deltaTime;
-			}
-			controller.Move(velocity * Time.deltaTime);
+		}
 
+		/// Chewck to see if we're off the ground.
+		private void OnTriggerExit(Collider other)
+		{
+			if (other.CompareTag("Ground"))
+				state &= ~PlayerState.Grounded;
+		}
+
+		/// Progress our timers.
+		private void Update()
+		{
 			if (!state.HasFlag(PlayerState.Grounded))
 				groundDelta += Time.deltaTime;
 
@@ -114,9 +125,7 @@ namespace Capstone
 			}
 		}
 
-		/// <summary>
 		/// Enable input actions.
-		/// </summary>
 		private void OnEnable()
 		{
 			jumpAction.performed += OnJump;
@@ -124,28 +133,58 @@ namespace Capstone
 			moveAction.canceled += OnMoveStopped;
 		}
 
-		/// <summary>
 		/// Disable input actions.
-		/// </summary>
 		private void OnDisable()
 		{
-			jumpAction.performed -= OnJump;
-			moveAction.started -= OnMoveStarted;
-			moveAction.canceled -= OnMoveStopped;
+			if (jumpAction != null) jumpAction.performed -= OnJump;
+
+			if (moveAction != null)
+			{
+				moveAction.started -= OnMoveStarted;
+				moveAction.canceled -= OnMoveStopped;
+			}
 		}
 
-		/// <summary>
+		/// Move our rigidbody on various elevated ground depending on raycast validation.
+		void Climb()
+		{
+			// Forward and back
+			if (Physics.Raycast(stepLower.position, transform.TransformDirection(Vector3.forward), out _, stepLowerRayCastDistance))
+			{
+				if (!Physics.Raycast(stepUpper.position, transform.TransformDirection(Vector3.forward), out _, stepUpperRayCastDistance))
+				{
+					physicsBody.position -= Vector3.up * -stepSmooth;
+				}
+			}
+
+			// Left
+			if (Physics.Raycast(stepLower.position, transform.TransformDirection(1.5f, 0f, 1f), out _, stepLowerRayCastDistance))
+			{
+				if (!Physics.Raycast(stepUpper.position, transform.TransformDirection(1.5f, 0f, 1f), out _, stepUpperRayCastDistance))
+				{
+					physicsBody.position -= Vector3.up * -stepSmooth;
+				}
+			}
+
+			// Right
+			if (Physics.Raycast(stepLower.position, transform.TransformDirection(-1.5f, 0, 1f), out _, stepLowerRayCastDistance))
+			{
+				if (!Physics.Raycast(stepUpper.position, transform.TransformDirection(-1.5f, 0f, 1f), out _, stepUpperRayCastDistance))
+				{
+					physicsBody.position -= Vector3.up * -stepSmooth;
+				}
+			}
+		}
+
 		/// Called when the player touches something
-		/// </summary>
-		/// <param name="hit">What was hit</param>
-		private void OnControllerColliderHit(ControllerColliderHit hit)
+		private void OnCollisionEnter(Collision collision)
 		{
 			// give the player some knockback and activate limited invulnerability
-			if (hit.gameObject.CompareTag("Enemy") || hit.gameObject.CompareTag("Hazard"))
+			if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Hazard"))
 			{
 				if (!state.HasFlag(PlayerState.Damaged))
 				{
-					physicsBody.AddImpact(Vector3.Normalize(-transform.forward), forceWhenDamaged);
+					physicsBody.AddForce(Vector3.Normalize(-transform.forward) * forceWhenDamaged, ForceMode.Impulse);
 					state |= PlayerState.Damaged;
 					damagedDelta = limitedInvulnerabilityTime;
 					StartCoroutine(DamageEffect());
@@ -153,6 +192,7 @@ namespace Capstone
 			}
 		}
 
+		/// Play the visual feedback for damage.
 		IEnumerator DamageEffect()
 		{
 			while (damagedDelta > 0f)
@@ -173,21 +213,17 @@ namespace Capstone
 			}
 		}
 
-		/// <summary>
 		/// Called when the 'fire' button is pressed
-		/// </summary>
 		public void OnFire(InputAction.CallbackContext context)
 		{
 		}
 
-		/// <summary>
 		/// Called when the 'jump' button is pressed
-		/// </summary>
 		public void OnJump(InputAction.CallbackContext context)
 		{
 			if (!state.HasFlag(PlayerState.Grounded) && jumpCount < maxJumps)
 			{
-				controller.velocity.Set(controller.velocity.x, 0f, controller.velocity.z); // zero out velocity for double (triple?) jumps
+				physicsBody.velocity.Set(physicsBody.velocity.x, 0f, physicsBody.velocity.z); // // zero out velocity for double (triple?) jumps
 				Jump();
 			}
 
@@ -197,18 +233,10 @@ namespace Capstone
 			jumpCount++;
 		}
 
-		/// <summary>
-		/// Apply velocity for a jump.
-		/// </summary>
-		void Jump()
-		{
-			velocity.y += Mathf.Sqrt(jumpForce * gravityMultiplier * Physics.gravity.y);
-			controller.Move(velocity * Time.deltaTime);
-		}
+		/// Apply force for a jump.
+		void Jump() => physicsBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
-		/// <summary>
 		/// Called when movement input is started
-		/// </summary>
 		public void OnMoveStarted(InputAction.CallbackContext context)
 		{
 			state |= PlayerState.Moving;
@@ -217,6 +245,7 @@ namespace Capstone
 			movement = input.x;
 		}
 
+		/// Called when move input stops.
 		public void OnMoveStopped(InputAction.CallbackContext context) => state &= ~PlayerState.Moving;
 	}
 }
