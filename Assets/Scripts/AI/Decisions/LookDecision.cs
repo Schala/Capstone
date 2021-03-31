@@ -32,7 +32,7 @@ namespace Capstone.AI.Decisions
 			{
 				if (hits[i].CompareTag("Player"))
 				{
-					controller.Target = hits[i].gameObject;
+					controller.Target = hits[i].transform;
 					return true;
 				}
 			}

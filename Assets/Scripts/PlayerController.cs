@@ -31,12 +31,14 @@ namespace Capstone
 		[SerializeField] Transform stepLower = null;
 		[SerializeField] float stepLowerRayCastDistance = 0.1f;
 		[SerializeField] float stepUpperRayCastDistance = 0.2f;
-		[SerializeField] float stepSmooth = 0.1f;
+		[SerializeField] float stepSmooth = 2f;
 
 		[Header("Jumping")]
 		[SerializeField] float jumpForce = 5f;
 		[SerializeField] float jumpTimeFrame = 0.25f;
 		[SerializeField] int maxJumps = 2;
+		[SerializeField] float collisionRadiusPadding = 0.1f;
+		[SerializeField] LayerMask groundMask;
 
 		[Header("Interaction")]
 		[SerializeField] float forceWhenDamaged = 5f;
@@ -45,12 +47,14 @@ namespace Capstone
 		Rigidbody physicsBody = null;
 		Material[] playerMaterials = null;
 		Color[] materialColors = null;
-		float movement = 0f;
+		Vector3 movement = Vector3.zero;
 		float groundDelta = 0f;
 		float damagedDelta = 0f;
+		Vector3 rayOrigin = Vector3.zero;
 		int jumpCount = 0;
 		PlayerState state = PlayerState.None;
 		PlayerInput playerInput = null;
+		CapsuleCollider playerCollider = null;
 
 		InputAction jumpAction = null;
 		InputAction moveAction = null;
@@ -59,6 +63,8 @@ namespace Capstone
 		private void Awake()
 		{
 			physicsBody = GetComponent<Rigidbody>();
+			playerCollider = GetComponent<CapsuleCollider>();
+			rayOrigin = playerCollider.bounds.center - transform.position;
 
 			playerInput = FindObjectOfType<GameManager>().GetComponent<PlayerInput>();
 			jumpAction = playerInput.actions.FindAction("Jump");
@@ -82,33 +88,41 @@ namespace Capstone
 		/// Apply any motion specified to the player.
 		private void FixedUpdate()
 		{
-			if (state.HasFlag(PlayerState.Moving))
-			{
-				if (state.HasFlag(PlayerState.Grounded))
-					physicsBody.AddForce(Vector3.forward * movement * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
-				else
-					physicsBody.AddForce(Vector3.forward * movement * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
-			}
+			if (!state.HasFlag(PlayerState.Moving)) return;
+
+			if (state.HasFlag(PlayerState.Grounded))
+				physicsBody.AddForce(movement * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
+			else
+				physicsBody.AddForce(movement * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
 
 			Climb();
 		}
 
-		/// Check to see if we're on the ground.
+		/// Check to see if we're on the ground or colliding with a hazard.
 		private void OnTriggerEnter(Collider other)
 		{
-			if (other.CompareTag("Ground"))
-			{
-				state |= PlayerState.Grounded;
-				jumpCount = 0;
-				groundDelta = 0f;
-			}
+			// give the player some knockback and activate limited invulnerability
+			if (other.CompareTag("Enemy") || other.CompareTag("Hazard"))
+				Damage();
 		}
 
-		/// Chewck to see if we're off the ground.
-		private void OnTriggerExit(Collider other)
+		/// Are we being naughty and standing in the fire?
+		private void OnTriggerStay(Collider other)
 		{
-			if (other.CompareTag("Ground"))
-				state &= ~PlayerState.Grounded;
+			// give the player some knockback and activate limited invulnerability
+			if (other.CompareTag("Enemy") || other.CompareTag("Hazard"))
+				Damage();
+		}
+
+		/// Run the damage logic for our player if not already doing so.
+		void Damage()
+		{
+			if (state.HasFlag(PlayerState.Damaged)) return;
+
+			physicsBody.AddForce(Vector3.Normalize(-transform.forward) * forceWhenDamaged, ForceMode.Impulse);
+			state |= PlayerState.Damaged;
+			damagedDelta = limitedInvulnerabilityTime;
+			StartCoroutine(DamageEffect());
 		}
 
 		/// Progress our timers.
@@ -123,6 +137,23 @@ namespace Capstone
 				if (damagedDelta <= 0f)
 					state &= ~PlayerState.Damaged;
 			}
+
+			//Debug.DrawRay(playerCollider.bounds.center, Vector3.down * (playerCollider.bounds.extents.y + groundDistanceFactor), Color.blue);
+			if (Physics.CheckSphere(rayOrigin, playerCollider.radius + collisionRadiusPadding, groundMask))
+			//Raycast(playerCollider.bounds.center, Vector3.down, playerCollider.bounds.extents.y + groundDistanceFactor, groundMask))
+			{
+				state |= PlayerState.Grounded;
+				jumpCount = 0;
+				groundDelta = 0f;
+			}
+			else
+				state &= ~PlayerState.Grounded;
+		}
+
+		private void OnDrawGizmos()
+		{
+			Gizmos.color = Color.blue;
+			Gizmos.DrawWireSphere(rayOrigin, playerCollider.radius + collisionRadiusPadding);
 		}
 
 		/// Enable input actions.
@@ -146,33 +177,29 @@ namespace Capstone
 		}
 
 		/// Move our rigidbody on various elevated ground depending on raycast validation.
+		/// First check our lower step. If it hits something, check the upper one.
+		/// If the upper one does NOT hit something, that's something the player can climb.
 		void Climb()
 		{
 			// Forward and back
-			if (Physics.Raycast(stepLower.position, transform.TransformDirection(Vector3.forward), out _, stepLowerRayCastDistance))
+			if (Physics.Raycast(stepLower.position, transform.TransformDirection(Vector3.forward), stepLowerRayCastDistance))
 			{
-				if (!Physics.Raycast(stepUpper.position, transform.TransformDirection(Vector3.forward), out _, stepUpperRayCastDistance))
-				{
-					physicsBody.position -= Vector3.up * -stepSmooth;
-				}
+				if (!Physics.Raycast(stepUpper.position, transform.TransformDirection(Vector3.forward), stepUpperRayCastDistance))
+					physicsBody.position -= Vector3.up * -stepSmooth * Time.deltaTime;
 			}
 
-			// Left
-			if (Physics.Raycast(stepLower.position, transform.TransformDirection(1.5f, 0f, 1f), out _, stepLowerRayCastDistance))
+			// Left by 45 degrees
+			if (Physics.Raycast(stepLower.position, transform.TransformDirection(1.5f, 0f, 1f), stepLowerRayCastDistance))
 			{
-				if (!Physics.Raycast(stepUpper.position, transform.TransformDirection(1.5f, 0f, 1f), out _, stepUpperRayCastDistance))
-				{
-					physicsBody.position -= Vector3.up * -stepSmooth;
-				}
+				if (!Physics.Raycast(stepUpper.position, transform.TransformDirection(1.5f, 0f, 1f), stepUpperRayCastDistance))
+					physicsBody.position -= Vector3.up * -stepSmooth * Time.deltaTime;
 			}
 
-			// Right
-			if (Physics.Raycast(stepLower.position, transform.TransformDirection(-1.5f, 0, 1f), out _, stepLowerRayCastDistance))
+			// Right by 45 degrees
+			if (Physics.Raycast(stepLower.position, transform.TransformDirection(-1.5f, 0, 1f), stepLowerRayCastDistance))
 			{
-				if (!Physics.Raycast(stepUpper.position, transform.TransformDirection(-1.5f, 0f, 1f), out _, stepUpperRayCastDistance))
-				{
-					physicsBody.position -= Vector3.up * -stepSmooth;
-				}
+				if (!Physics.Raycast(stepUpper.position, transform.TransformDirection(-1.5f, 0f, 1f), stepUpperRayCastDistance))
+					physicsBody.position -= Vector3.up * -stepSmooth * Time.deltaTime;
 			}
 		}
 
@@ -181,15 +208,7 @@ namespace Capstone
 		{
 			// give the player some knockback and activate limited invulnerability
 			if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Hazard"))
-			{
-				if (!state.HasFlag(PlayerState.Damaged))
-				{
-					physicsBody.AddForce(Vector3.Normalize(-transform.forward) * forceWhenDamaged, ForceMode.Impulse);
-					state |= PlayerState.Damaged;
-					damagedDelta = limitedInvulnerabilityTime;
-					StartCoroutine(DamageEffect());
-				}
-			}
+				Damage();
 		}
 
 		/// Play the visual feedback for damage.
@@ -242,7 +261,9 @@ namespace Capstone
 			state |= PlayerState.Moving;
 
 			var input = context.ReadValue<Vector2>();
-			movement = input.x;
+			movement = Vector3.forward * input.x;
+
+			if (movement != Vector3.zero) transform.rotation = Quaternion.LookRotation(movement);
 		}
 
 		/// Called when move input stops.

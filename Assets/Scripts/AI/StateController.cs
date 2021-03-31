@@ -18,29 +18,23 @@ using UnityEngine;
 
 namespace Capstone.AI
 {
-    /// <summary>
     /// Manages AI state flow
-    /// </summary>
     [RequireComponent(typeof(AIMovement))]
     public class StateController : MonoBehaviour
     {
         public Transform[] waypoints;
         public bool active;
+        public float lookRadius = 1f;
+        public float searchDuration = 4f;
 
         [Header("States")]
         public State currentState;
         public State remainState;
 
-        [Header("Looking")]
-        public float lookRadius = 1f;
-
-        [Header("Searching")]
-        public float searchDuration = 4f;
-
         public int NextWaypoint { get; set; } = 0;
         public float StateTimeElapsed { get; private set; } = 0f;
         public AIMovement Movement { get; private set; } = null;
-        public GameObject Target { get; set; } = null;
+        public Transform Target { get; set; } = null;
 
         private void Awake() => Movement = GetComponent<AIMovement>();
 
@@ -52,9 +46,7 @@ namespace Capstone.AI
 
         private void Start() => Movement.Active = active;
 
-        /// <summary>
         /// Draw some helpful debug visuals.
-        /// </summary>
         private void OnDrawGizmos()
         {
             if (currentState == null) return;
@@ -62,9 +54,7 @@ namespace Capstone.AI
             Gizmos.DrawWireSphere(transform.position, lookRadius);
         }
 
-        /// <summary>
         /// Transition to the specified state.
-        /// </summary>
         public void TransitionToState(State newState)
         {
             if (newState == remainState) return;
@@ -72,9 +62,7 @@ namespace Capstone.AI
             StateTimeElapsed = 0f;
         }
 
-        /// <summary>
         /// Has the state elapsed the specified duration?
-        /// </summary>
         public bool CheckIfCountDownElapsed(float duration)
         {
             StateTimeElapsed += Time.deltaTime;

@@ -18,9 +18,7 @@ using UnityEngine;
 
 namespace Capstone.AI
 {
-	/// <summary>
 	/// A state of AI behavior
-	/// </summary>
 	[CreateAssetMenu(menuName = "AI/State")]
 	public class State : ScriptableObject
 	{
@@ -28,27 +26,21 @@ namespace Capstone.AI
 		[SerializeField] Transition[] transitions;
 		public Color sceneGizmoColor = Color.gray;
 
-		/// <summary>
 		/// Called by the state controller to update the associated states
-		/// </summary>
 		public void UpdateState(StateController controller)
 		{
 			DoActions(controller);
 			CheckTransitions(controller);
 		}
 
-		/// <summary>
 		/// Execute the state's actions.
-		/// </summary>
 		void DoActions(StateController controller)
 		{
 			for (int i = 0; i < actions.Length; i++)
 				actions[i].Act(controller);
 		}
 
-		/// <summary>
 		/// Check to see if the state should transition or not.
-		/// </summary>
 		void CheckTransitions(StateController controller)
 		{
 			for (int i = 0; i < transitions.Length; i++)

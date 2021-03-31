@@ -91,8 +91,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5805051160590686448}
-  - component: {fileID: 2650231883291219459}
   - component: {fileID: 5231928796399927722}
+  - component: {fileID: 6381779088289228486}
   - component: {fileID: 7482628854015558844}
   - component: {fileID: 6448285155075830011}
   m_Layer: 0
@@ -117,24 +117,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!143 &2650231883291219459
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5042394354260123641}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Height: 1
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1.25, z: 0}
 --- !u!195 &5231928796399927722
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -157,6 +139,19 @@ NavMeshAgent:
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
+--- !u!135 &6381779088289228486
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5042394354260123641}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Center: {x: 0, y: 1.25, z: 0}
 --- !u!114 &7482628854015558844
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -170,8 +165,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 1
-  turnSpeed: 10
+  turnSpeed: 500
   epsilon: 0.1
+  groundDistanceFactor: 0.1
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!114 &6448285155075830011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,10 +185,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   waypoints: []
   active: 1
-  currentState: {fileID: 11400000, guid: 7402362c6352b5443af0df9042522e98, type: 2}
-  remainState: {fileID: 11400000, guid: de8de00c4f52d114794fed332a09a2f2, type: 2}
   lookRadius: 1
   searchDuration: 4
+  currentState: {fileID: 11400000, guid: 7402362c6352b5443af0df9042522e98, type: 2}
+  remainState: {fileID: 11400000, guid: de8de00c4f52d114794fed332a09a2f2, type: 2}
 --- !u!1 &5995397543261297653
 GameObject:
   m_ObjectHideFlags: 0

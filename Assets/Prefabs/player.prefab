@@ -153,7 +153,6 @@ GameObject:
   - component: {fileID: 3583626243182116000}
   - component: {fileID: 2051590423403923462}
   - component: {fileID: 5086737351805180219}
-  - component: {fileID: 3468394399017282586}
   - component: {fileID: 1373913932613343671}
   m_Layer: 0
   m_Name: player
@@ -187,7 +186,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9011791470097645606}
   serializedVersion: 2
-  m_Mass: 1
+  m_Mass: 0.65
   m_Drag: 1
   m_AngularDrag: 0.05
   m_UseGravity: 1
@@ -209,19 +208,6 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
---- !u!65 &3468394399017282586
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9011791470097645606}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 0.0675, z: 1}
-  m_Center: {x: 0, y: 0.03375, z: 0}
 --- !u!114 &1373913932613343671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -240,10 +226,14 @@ MonoBehaviour:
   stepLower: {fileID: 612475465040626379}
   stepLowerRayCastDistance: 0.1
   stepUpperRayCastDistance: 0.2
-  stepSmooth: 0.1
+  stepSmooth: 0.05
   jumpForce: 5
   jumpTimeFrame: 0.25
   maxJumps: 2
+  groundDistanceFactor: 0.1
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 8
   forceWhenDamaged: 5
   limitedInvulnerabilityTime: 1
 --- !u!1 &9112116879536915508

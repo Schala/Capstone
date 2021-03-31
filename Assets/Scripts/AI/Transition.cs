@@ -18,9 +18,7 @@ using System;
 
 namespace Capstone.AI
 {
-    /// <summary>
     /// A transition for a State object which holds references to outcomes for the decision it references
-    /// </summary>
     [Serializable]
     public class Transition
     {

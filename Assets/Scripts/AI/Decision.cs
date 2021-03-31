@@ -18,14 +18,10 @@ using UnityEngine;
 
 namespace Capstone.AI
 {
-    /// <summary>
     /// A pluggable decision for an AI state machine
-    /// </summary>
     public abstract class Decision : ScriptableObject
     {
-        /// <summary>
         /// Determines AI state flow, given one of two outcomes
-        /// </summary>
         public abstract bool Decide(StateController controller);
     }
 }
