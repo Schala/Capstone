@@ -115,7 +115,8 @@ namespace Capstone
 		{
 			if (state.HasFlag(PlayerState.Damaged)) return;
 
-			physicsBody.AddForce(Vector3.Normalize(-transform.forward) * forceWhenDamaged, ForceMode.Impulse);
+			var forwardForce = UnityEngine.Random.Range(0, 2) >= 1;
+			physicsBody.AddForce(Vector3.Normalize(forwardForce ? transform.forward : -transform.forward) * forceWhenDamaged, ForceMode.Impulse);
 			state |= PlayerState.Damaged;
 			damagedDelta = limitedInvulnerabilityTime;
 			StartCoroutine(DamageEffect());
