@@ -35,7 +35,6 @@ namespace Capstone
 
 		[Header("Jumping")]
 		[SerializeField] float jumpForce = 5f;
-		[SerializeField] float jumpTimeFrame = 0.25f;
 		[SerializeField] int maxJumps = 2;
 		[SerializeField] float collisionRadiusPadding = 0.1f;
 		[SerializeField] LayerMask groundMask;
@@ -48,9 +47,7 @@ namespace Capstone
 		Material[] playerMaterials = null;
 		Color[] materialColors = null;
 		Vector3 movement = Vector3.zero;
-		float groundDelta = 0f;
 		float damagedDelta = 0f;
-		Vector3 rayOrigin = Vector3.zero;
 		int jumpCount = 0;
 		PlayerState state = PlayerState.None;
 		PlayerInput playerInput = null;
@@ -64,7 +61,6 @@ namespace Capstone
 		{
 			physicsBody = GetComponent<Rigidbody>();
 			playerCollider = GetComponent<CapsuleCollider>();
-			rayOrigin = playerCollider.bounds.center - transform.position;
 
 			playerInput = FindObjectOfType<GameManager>().GetComponent<PlayerInput>();
 			jumpAction = playerInput.actions.FindAction("Jump");
@@ -125,11 +121,16 @@ namespace Capstone
 			StartCoroutine(DamageEffect());
 		}
 
-		/// Progress our timers.
+		/// Progress our timers and check if we're on the ground.
 		private void Update()
 		{
-			if (!state.HasFlag(PlayerState.Grounded))
-				groundDelta += Time.deltaTime;
+			if (Physics.CheckSphere(transform.position, playerCollider.radius - collisionRadiusPadding, groundMask))
+			{
+				state |= PlayerState.Grounded;
+				jumpCount = 0;
+			}
+			else
+				state &= ~PlayerState.Grounded;
 
 			if (state.HasFlag(PlayerState.Damaged))
 			{
@@ -137,23 +138,14 @@ namespace Capstone
 				if (damagedDelta <= 0f)
 					state &= ~PlayerState.Damaged;
 			}
-
-			//Debug.DrawRay(playerCollider.bounds.center, Vector3.down * (playerCollider.bounds.extents.y + groundDistanceFactor), Color.blue);
-			if (Physics.CheckSphere(rayOrigin, playerCollider.radius + collisionRadiusPadding, groundMask))
-			//Raycast(playerCollider.bounds.center, Vector3.down, playerCollider.bounds.extents.y + groundDistanceFactor, groundMask))
-			{
-				state |= PlayerState.Grounded;
-				jumpCount = 0;
-				groundDelta = 0f;
-			}
-			else
-				state &= ~PlayerState.Grounded;
 		}
 
 		private void OnDrawGizmos()
 		{
+			if (playerCollider == null) return;
+
 			Gizmos.color = Color.blue;
-			Gizmos.DrawWireSphere(rayOrigin, playerCollider.radius + collisionRadiusPadding);
+			Gizmos.DrawWireSphere(transform.position, playerCollider.radius - collisionRadiusPadding);
 		}
 
 		/// Enable input actions.
@@ -240,16 +232,16 @@ namespace Capstone
 		/// Called when the 'jump' button is pressed
 		public void OnJump(InputAction.CallbackContext context)
 		{
-			if (!state.HasFlag(PlayerState.Grounded) && jumpCount < maxJumps)
+			if (++jumpCount >= maxJumps) return;
+
+			if (!state.HasFlag(PlayerState.Grounded))
 			{
-				physicsBody.velocity.Set(physicsBody.velocity.x, 0f, physicsBody.velocity.z); // // zero out velocity for double (triple?) jumps
+				physicsBody.velocity.Set(physicsBody.velocity.x, 0f, physicsBody.velocity.z); // zero out velocity for double (triple?) jumps
 				Jump();
 			}
 
 			if (state.HasFlag(PlayerState.Grounded))
 				Jump();
-
-			jumpCount++;
 		}
 
 		/// Apply force for a jump.
