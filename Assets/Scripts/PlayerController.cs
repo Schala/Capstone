@@ -40,7 +40,7 @@ namespace Capstone
 		[SerializeField] float collisionRadiusPadding = 0.1f;
 		[SerializeField] LayerMask groundMask;
 		[SerializeField] Transform center = null;
-		[SerializeField] float wallRayCheckPadding = 0.05f;
+		[SerializeField] float wallRayCheckPadding = 0.25f;
 
 		[Header("Interaction")]
 		[SerializeField] float forceWhenDamaged = 5f;

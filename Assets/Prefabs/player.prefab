@@ -259,7 +259,6 @@ MonoBehaviour:
   stepUpperRayCastDistance: 0.2
   stepSmooth: 0.05
   jumpForce: 10
-  frictionedJumpMultiplier: 1.5
   maxJumps: 2
   collisionRadiusPadding: 0.1
   groundMask:
