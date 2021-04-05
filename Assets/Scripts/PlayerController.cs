@@ -14,7 +14,8 @@ namespace Capstone
 		Grounded = 1,
 		Moving = 2,
 		Fired = 4,
-		Damaged = 8
+		Damaged = 8,
+		HitWall = 16
 	}
 
 	/// Manages player input, movement and actions
@@ -38,6 +39,8 @@ namespace Capstone
 		[SerializeField] int maxJumps = 2;
 		[SerializeField] float collisionRadiusPadding = 0.1f;
 		[SerializeField] LayerMask groundMask;
+		[SerializeField] Transform center = null;
+		[SerializeField] float wallRayCheckPadding = 0.05f;
 
 		[Header("Interaction")]
 		[SerializeField] float forceWhenDamaged = 5f;
@@ -85,13 +88,14 @@ namespace Capstone
 		private void FixedUpdate()
 		{
 			if (!state.HasFlag(PlayerState.Moving)) return;
+			if ((state.HasFlag(PlayerState.HitWall) && transform.rotation.y == 0f) || (state.HasFlag(PlayerState.HitWall) && transform.rotation.y == 180f)) return;
+
+			Climb();
 
 			if (state.HasFlag(PlayerState.Grounded))
 				physicsBody.AddForce(movement * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
 			else
 				physicsBody.AddForce(movement * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
-
-			Climb();
 		}
 
 		/// Check to see if we're on the ground or colliding with a hazard.
@@ -115,8 +119,7 @@ namespace Capstone
 		{
 			if (state.HasFlag(PlayerState.Damaged)) return;
 
-			var forwardForce = UnityEngine.Random.Range(0, 2) >= 1;
-			physicsBody.AddForce(Vector3.Normalize(forwardForce ? transform.forward : -transform.forward) * forceWhenDamaged, ForceMode.Impulse);
+			physicsBody.AddForce(Vector3.Normalize(-transform.forward) * forceWhenDamaged, ForceMode.Impulse);
 			state |= PlayerState.Damaged;
 			damagedDelta = limitedInvulnerabilityTime;
 			StartCoroutine(DamageEffect());
@@ -132,6 +135,11 @@ namespace Capstone
 			}
 			else
 				state &= ~PlayerState.Grounded;
+
+			if (Physics.Raycast(center.position, Vector3.Normalize(transform.forward), (playerCollider.radius / 2f) + wallRayCheckPadding, groundMask))
+				state |= PlayerState.HitWall;
+			else
+				state &= ~PlayerState.HitWall;
 
 			if (state.HasFlag(PlayerState.Damaged))
 			{
@@ -246,7 +254,7 @@ namespace Capstone
 		}
 
 		/// Apply force for a jump.
-		void Jump() => physicsBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+		void Jump() => physicsBody.velocity += Vector3.up * jumpForce;
 
 		/// Called when movement input is started
 		public void OnMoveStarted(InputAction.CallbackContext context)
