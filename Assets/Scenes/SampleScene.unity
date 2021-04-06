@@ -965,10 +965,6 @@ PrefabInstance:
       propertyPath: turnSpeed
       value: 125
       objectReference: {fileID: 0}
-    - target: {fileID: 1373913932613343671, guid: 1f3a77fbf2791d44c85908b598a4b7a5, type: 3}
-      propertyPath: wallRayCheckPadding
-      value: 0.25
-      objectReference: {fileID: 0}
     - target: {fileID: 3583626243182116000, guid: 1f3a77fbf2791d44c85908b598a4b7a5, type: 3}
       propertyPath: m_RootOrder
       value: 8
