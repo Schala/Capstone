@@ -63,7 +63,7 @@ namespace Capstone
                 for (int j = 0; j < items[i].amount; j++)
                 {
                     var obj = Instantiate(items[i].prefab);
-                    obj.name = $"{obj.name} {(char)(j + 65)}";
+                    obj.name = $"{obj.name} {j}";
                     obj.SetActive(false);
                     pool.Add(obj);
                 }

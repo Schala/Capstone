@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace Capstone
+namespace Capstone.Player
 {
 	/// Various states of our player
 	[Flags]
@@ -38,9 +38,12 @@ namespace Capstone
 		[SerializeField] float jumpForce = 5f;
 		[SerializeField] int maxJumps = 2;
 		[SerializeField] float collisionRadiusPadding = 0.1f;
-		[SerializeField] LayerMask groundMask;
 		[SerializeField] Transform center = null;
 		[SerializeField] float wallRayCheckPadding = 0.25f;
+
+		[Header("Attacking")]
+		[SerializeField] GameObject weapon = null;
+		[SerializeField] float weaponActiveTime = 0.5f;
 
 		[Header("Interaction")]
 		[SerializeField] float forceWhenDamaged = 5f;
@@ -55,9 +58,12 @@ namespace Capstone
 		PlayerState state = PlayerState.None;
 		PlayerInput playerInput = null;
 		CapsuleCollider playerCollider = null;
+		PlayerWeapon weaponBehavior = null;
+		LayerMask groundMask;
 
 		InputAction jumpAction = null;
 		InputAction moveAction = null;
+		InputAction fireAction = null;
 
 		/// Set up our input actions and gather material info.
 		private void Awake()
@@ -66,8 +72,10 @@ namespace Capstone
 			playerCollider = GetComponent<CapsuleCollider>();
 
 			playerInput = FindObjectOfType<GameManager>().GetComponent<PlayerInput>();
+			groundMask = LayerMask.GetMask("Ground");
 			jumpAction = playerInput.actions.FindAction("Jump");
 			moveAction = playerInput.actions.FindAction("Move");
+			fireAction = playerInput.actions.FindAction("Fire");
 
 			var renderers = GetComponentsInChildren<Renderer>();
 			var playerMaterialsList = new List<Material>();
@@ -82,6 +90,8 @@ namespace Capstone
 			}
 			playerMaterials = playerMaterialsList.ToArray();
 			materialColors = materialColorsList.ToArray();
+
+			weaponBehavior = weapon.GetComponent<PlayerWeapon>();
 		}
 
 		/// Apply any motion specified to the player.
@@ -98,28 +108,12 @@ namespace Capstone
 				physicsBody.AddForce(movement * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
 		}
 
-		/// Check to see if we're on the ground or colliding with a hazard.
-		private void OnTriggerEnter(Collider other)
-		{
-			// give the player some knockback and activate limited invulnerability
-			if (other.CompareTag("Enemy") || other.CompareTag("Hazard"))
-				Damage();
-		}
-
-		/// Are we being naughty and standing in the fire?
-		private void OnTriggerStay(Collider other)
-		{
-			// give the player some knockback and activate limited invulnerability
-			if (other.CompareTag("Enemy") || other.CompareTag("Hazard"))
-				Damage();
-		}
-
 		/// Run the damage logic for our player if not already doing so.
-		void Damage()
+		public void Damage()
 		{
 			if (state.HasFlag(PlayerState.Damaged)) return;
 
-			physicsBody.AddForce(Vector3.Normalize(-transform.forward) * forceWhenDamaged, ForceMode.Impulse);
+			physicsBody.AddForce(-transform.forward * forceWhenDamaged, ForceMode.Impulse);
 			state |= PlayerState.Damaged;
 			damagedDelta = limitedInvulnerabilityTime;
 			StartCoroutine(DamageEffect());
@@ -136,7 +130,7 @@ namespace Capstone
 			else
 				state &= ~PlayerState.Grounded;
 
-			if (Physics.Raycast(center.position, Vector3.Normalize(transform.forward), (playerCollider.radius / 2f) + wallRayCheckPadding, groundMask))
+			if (Physics.Raycast(center.position, transform.forward, (playerCollider.radius / 2f) + wallRayCheckPadding, groundMask))
 				state |= PlayerState.HitWall;
 			else
 				state &= ~PlayerState.HitWall;
@@ -163,12 +157,14 @@ namespace Capstone
 			jumpAction.performed += OnJump;
 			moveAction.started += OnMoveStarted;
 			moveAction.canceled += OnMoveStopped;
+			fireAction.performed += OnFire;
 		}
 
 		/// Disable input actions.
 		private void OnDisable()
 		{
 			if (jumpAction != null) jumpAction.performed -= OnJump;
+			if (fireAction != null) fireAction.performed -= OnFire;
 
 			if (moveAction != null)
 			{
@@ -204,14 +200,6 @@ namespace Capstone
 			}
 		}
 
-		/// Called when the player touches something
-		private void OnCollisionEnter(Collision collision)
-		{
-			// give the player some knockback and activate limited invulnerability
-			if (collision.gameObject.CompareTag("Enemy") || collision.gameObject.CompareTag("Hazard"))
-				Damage();
-		}
-
 		/// Play the visual feedback for damage.
 		IEnumerator DamageEffect()
 		{
@@ -236,6 +224,10 @@ namespace Capstone
 		/// Called when the 'fire' button is pressed
 		public void OnFire(InputAction.CallbackContext context)
 		{
+			if (weapon.activeInHierarchy)
+				weaponBehavior.Refresh();
+			else
+				weapon.SetActive(true);
 		}
 
 		/// Called when the 'jump' button is pressed

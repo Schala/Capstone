@@ -220,6 +220,17 @@
                 },
                 {
                     "name": "",
+                    "id": "0962a020-e654-4840-8f95-772333880c4f",
+                    "path": "<Keyboard>/leftCtrl",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Fire",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "a1a7fd92-a2e2-4d95-a22f-3771e62f66d7",
                     "path": "<Keyboard>/space",
                     "interactions": "",
