@@ -1407,6 +1407,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3373743829277269051, guid: 7a6c699ecc18c054dad214eba645f423, type: 3}
+      propertyPath: waypointEpsilon
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3373743829277269051, guid: 7a6c699ecc18c054dad214eba645f423, type: 3}
+      propertyPath: waypoints.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3373743829277269051, guid: 7a6c699ecc18c054dad214eba645f423, type: 3}
+      propertyPath: waypoints.Array.data[0]
+      value: 
+      objectReference: {fileID: 306014281}
+    - target: {fileID: 3373743829277269051, guid: 7a6c699ecc18c054dad214eba645f423, type: 3}
+      propertyPath: waypoints.Array.data[1]
+      value: 
+      objectReference: {fileID: 396075124}
     - target: {fileID: 5042394354260123641, guid: 7a6c699ecc18c054dad214eba645f423, type: 3}
       propertyPath: m_Name
       value: test enemy
