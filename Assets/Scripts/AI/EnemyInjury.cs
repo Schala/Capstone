@@ -4,18 +4,15 @@ using UnityEngine;
 namespace Capstone.AI
 {
 	/// <summary>
-	/// Abstract base class for all enemy behavior
+	/// Logic when an enemy is injured
 	/// </summary>
-	public abstract class BaseEnemyAI : MonoBehaviour
+	public class EnemyInjury : MonoBehaviour
 	{
 		[SerializeField] float forceWhenDamaged = 5f;
 
-		protected Rigidbody physicsBody = null;
+		Rigidbody physicsBody = null;
 
-		private void Awake()
-		{
-			physicsBody = GetComponent<Rigidbody>();
-		}
+		private void Awake() => physicsBody = GetComponent<Rigidbody>();
 
 		/// <summary>
 		/// Enemy damage and knockback

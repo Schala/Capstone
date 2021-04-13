@@ -34,6 +34,6 @@ public class PlayerWeapon : MonoBehaviour
 	private void OnCollisionEnter(Collision collision)
 	{
 		if (collision.gameObject.CompareTag("Enemy"))
-			collision.gameObject.GetComponent<BaseEnemyAI>().Damage(transform.forward);
+			collision.gameObject.GetComponent<EnemyInjury>().Damage(transform.forward);
 	}
 }

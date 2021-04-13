@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - Hazard
   - Player Attack
+  - Projectile
   layers:
   - Default
   - TransparentFX
@@ -16,9 +17,9 @@ TagManager:
   - Water
   - UI
   - Weapon
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - Projectile
   - 
   - 
   - 

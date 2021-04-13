@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Capstone
 {
 	/// <summary>
-	/// Allows for multiple tags on an object
+	/// Allows for multiple tags on an object, specifically for object pools.
 	/// </summary>
 	public class TagCollection : MonoBehaviour
 	{

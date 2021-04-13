@@ -33,6 +33,7 @@ namespace Capstone.Player
 		[SerializeField] float stepLowerRayCastDistance = 0.1f;
 		[SerializeField] float stepUpperRayCastDistance = 0.2f;
 		[SerializeField] float stepSmooth = 2f;
+		public bool shouldStep = true;
 
 		[Header("Jumping")]
 		[SerializeField] float jumpForce = 5f;
@@ -98,9 +99,9 @@ namespace Capstone.Player
 		private void FixedUpdate()
 		{
 			if (!state.HasFlag(PlayerState.Moving)) return;
-			if ((state.HasFlag(PlayerState.HitWall) && transform.rotation.y == 0f) || (state.HasFlag(PlayerState.HitWall) && transform.rotation.y == 180f)) return;
+			if (state.HasFlag(PlayerState.HitWall)) return;
 
-			Climb();
+			if (shouldStep) Climb();
 
 			if (state.HasFlag(PlayerState.Grounded))
 				physicsBody.AddForce(movement * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
@@ -130,7 +131,7 @@ namespace Capstone.Player
 			else
 				state &= ~PlayerState.Grounded;
 
-			if (Physics.Raycast(center.position, transform.forward, (playerCollider.radius / 2f) + wallRayCheckPadding, groundMask))
+			if (Physics.Raycast(center.position, center.forward, playerCollider.radius / 2f + wallRayCheckPadding, groundMask))
 				state |= PlayerState.HitWall;
 			else
 				state &= ~PlayerState.HitWall;

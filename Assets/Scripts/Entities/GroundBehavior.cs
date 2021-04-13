@@ -1,18 +1,21 @@
 using UnityEngine;
 
-namespace Capstone.AI
+namespace Capstone.Entities
 {
 	/// <summary>
-	/// Abstract base class for ground-dwelling enemies
+	/// Keeps gravity factored in to an entity
 	/// </summary>
-	public abstract class BaseGroundEnemyAI : BaseEnemyAI
-	{
+	[RequireComponent(typeof(Rigidbody))]
+    public class GroundBehavior : MonoBehaviour
+    {
 		[SerializeField] float collisionRadius = 0.75f;
-		
+
+		Rigidbody physicsBody = null;
 		LayerMask groundMask;
 
 		private void Awake()
 		{
+			physicsBody = GetComponent<Rigidbody>();
 			groundMask = LayerMask.GetMask("Ground");
 		}
 

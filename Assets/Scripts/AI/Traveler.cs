@@ -3,11 +3,15 @@ using UnityEngine;
 namespace Capstone.AI
 {
 	/// <summary>
-	/// AI for a basic enemy that simply moves between points
+	/// AI for an enemy that simply moves between points
 	/// </summary>
-	public class BasicMovingGroundEnemyAI : BaseGroundEnemyAI
+	public class Traveler : MonoBehaviour
 	{
-		[SerializeField] float moveSpeed = 0.25f;
+		[SerializeField] bool active = false;
+
+		[Header("Movement")]
+		[SerializeField] float moveSpeed = 5f;
+		[SerializeField] float turnSpeed = 100f;
 
 		[Header("Waypoints")]
 		[SerializeField] float waypointEpsilon = 0.1f;
@@ -17,13 +21,17 @@ namespace Capstone.AI
 
 		private void Update()
 		{
+			if (!active) return;
+
 			transform.position = Vector3.MoveTowards(transform.position, waypoints[nextWaypoint].position, moveSpeed * Time.deltaTime);
 
 			if (Vector3.Distance(transform.position, waypoints[nextWaypoint].position) < waypointEpsilon)
 			{
 				nextWaypoint++;
 				nextWaypoint %= waypoints.Length;
-				transform.LookAt(waypoints[nextWaypoint], Vector3.up);
+				var distance = waypoints[nextWaypoint].position - transform.position;
+				transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(distance), turnSpeed * Time.deltaTime);
+				transform.eulerAngles = Vector3.up * transform.eulerAngles.y;
 			}
 		}
 	}

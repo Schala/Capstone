@@ -94,8 +94,10 @@ GameObject:
   - component: {fileID: 5654594887155226554}
   - component: {fileID: 285186122421574205}
   - component: {fileID: 6211433457424881254}
+  - component: {fileID: 4718633339837944626}
+  - component: {fileID: 4656860072201988219}
   m_Layer: 0
-  m_Name: test enemy
+  m_Name: test move enemy
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -157,14 +159,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 679919b41e560b346bf74f019d5197eb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  forceWhenDamaged: 5
-  collisionRadius: 0.75
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 8
+  active: 0
   moveSpeed: 0.25
+  turnSpeed: 100
   waypointEpsilon: 0.1
   waypoints: []
+--- !u!114 &4718633339837944626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5042394354260123641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f91a05c9ae3e054cb846137541e4e43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collisionRadius: 0.75
+--- !u!114 &4656860072201988219
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5042394354260123641}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be9cb34241faba34781be91ab5f4e11a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  forceWhenDamaged: 5
 --- !u!1 &5995397543261297653
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4356159800567949925}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: center
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -149,7 +149,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3044480291310230597}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: step upper
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -181,7 +181,7 @@ GameObject:
   - component: {fileID: 4856637549886782400}
   - component: {fileID: 8871179704514688551}
   - component: {fileID: 6927940025179686464}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -261,7 +261,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 612475465040626379}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: step lower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -294,7 +294,7 @@ GameObject:
   - component: {fileID: 2051590423403923462}
   - component: {fileID: 5086737351805180219}
   - component: {fileID: 1373913932613343671}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -372,11 +372,8 @@ MonoBehaviour:
   jumpForce: 10
   maxJumps: 2
   collisionRadiusPadding: 0.1
-  groundMask:
-    serializedVersion: 2
-    m_Bits: 8
   center: {fileID: 4356159800567949925}
-  wallRayCheckPadding: 0.25
+  wallRayCheckPadding: 0.3
   weapon: {fileID: 2264204236811160791}
   weaponActiveTime: 0.5
   forceWhenDamaged: 5
@@ -392,7 +389,7 @@ GameObject:
   - component: {fileID: 6513672414595535375}
   - component: {fileID: 929221880561792492}
   - component: {fileID: 9206874667945229415}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
