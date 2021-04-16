@@ -9,6 +9,7 @@ namespace Capstone.Entities
     public class GroundBehavior : MonoBehaviour
     {
 		[SerializeField] float collisionRadius = 0.75f;
+		public bool alwaysUseGravity = false;
 
 		Rigidbody physicsBody = null;
 		LayerMask groundMask;
@@ -20,11 +21,18 @@ namespace Capstone.Entities
 		}
 
 		/// <summary>
+		/// Is the entity on the ground?
+		/// </summary>
+		public bool IsGrounded => Physics.CheckSphere(transform.position, collisionRadius, groundMask);
+
+		/// <summary>
 		/// Basic gravity check
 		/// </summary>
 		private void FixedUpdate()
 		{
-			if (Physics.CheckSphere(transform.position, collisionRadius, groundMask))
+			if (alwaysUseGravity) return;
+
+			if (IsGrounded)
 				physicsBody.useGravity = false;
 			else
 				physicsBody.useGravity = true;

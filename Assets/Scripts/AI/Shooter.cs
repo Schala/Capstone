@@ -23,7 +23,7 @@ namespace Capstone.AI
 		/// <summary>
 		/// If conditions are right, shoot at the player periodically.
 		/// </summary>
-		private void FixedUpdate()
+		private void Update()
         {
             if (!awareness.enabled || awareness.Target == null) return;
 
@@ -34,6 +34,9 @@ namespace Capstone.AI
             if (canFire) StartCoroutine(Shoot());
         }
 
+        /// <summary>
+        /// Retrieve a projectile from our object pool and set its position and forward vector.
+        /// </summary>
         IEnumerator Shoot()
         {
             canFire = false;
