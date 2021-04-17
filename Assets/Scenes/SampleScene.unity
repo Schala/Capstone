@@ -226,9 +226,10 @@ GameObject:
   m_Component:
   - component: {fileID: 194946556}
   - component: {fileID: 194946557}
+  - component: {fileID: 194946559}
   - component: {fileID: 194946555}
   - component: {fileID: 194946558}
-  - component: {fileID: 194946559}
+  - component: {fileID: 194946560}
   m_Layer: 0
   m_Name: game manager
   m_TagString: Untagged
@@ -456,6 +457,25 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
+--- !u!114 &194946560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 194946554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7420a471a23cf1f48bc86300bf776a12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxRotation: 0.5
+  speed: 2
+  swings:
+  - {fileID: 796140911}
+  - {fileID: 962380579}
+  - {fileID: 710811596}
+  batchCount: -1
 --- !u!1 &306014280
 GameObject:
   m_ObjectHideFlags: 0
@@ -926,6 +946,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 479a41f96d0fdf34d9ee82cd0f696374, type: 3}
+--- !u!4 &710811596 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2989777004010804709, guid: 479a41f96d0fdf34d9ee82cd0f696374, type: 3}
+  m_PrefabInstance: {fileID: 710811595}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &796140910
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1003,6 +1028,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 479a41f96d0fdf34d9ee82cd0f696374, type: 3}
+--- !u!4 &796140911 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2989777004010804709, guid: 479a41f96d0fdf34d9ee82cd0f696374, type: 3}
+  m_PrefabInstance: {fileID: 796140910}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &962212859
 GameObject:
   m_ObjectHideFlags: 0
@@ -1150,6 +1180,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 479a41f96d0fdf34d9ee82cd0f696374, type: 3}
+--- !u!4 &962380579 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2989777004010804709, guid: 479a41f96d0fdf34d9ee82cd0f696374, type: 3}
+  m_PrefabInstance: {fileID: 962380578}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1036380695
 MonoBehaviour:
   m_ObjectHideFlags: 0
