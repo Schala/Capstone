@@ -470,7 +470,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxRotation: 0.5
-  speed: 2
+  speed: 0.5
   swings:
   - {fileID: 796140911}
   - {fileID: 962380579}

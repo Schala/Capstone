@@ -103,10 +103,15 @@ namespace Capstone
             return null;
         }
 
-        /// <summary>
-        /// Delete every item from the pool.
-        /// </summary>
-        private void OnDestroy()
+		/// <summary>
+		/// Retrieve all objects of a specified tag, putting them in the specified array.
+		/// </summary>
+		public static void GetAllOf(string tag, out GameObject[] objects) => objects = instance.pool.FindAll((_) => Get(tag)).ToArray();
+
+		/// <summary>
+		/// Delete every item from the pool.
+		/// </summary>
+		private void OnDestroy()
         {
             for (int i = 0; i < pool.Count; i++)
                 Destroy(pool[i]);
