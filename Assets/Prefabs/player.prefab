@@ -293,7 +293,10 @@ GameObject:
   - component: {fileID: 3583626243182116000}
   - component: {fileID: 2051590423403923462}
   - component: {fileID: 5086737351805180219}
+  - component: {fileID: 965584660323305542}
+  - component: {fileID: 581467683131000933}
   - component: {fileID: 1373913932613343671}
+  - component: {fileID: 4359677745402088481}
   m_Layer: 7
   m_Name: player
   m_TagString: Player
@@ -350,6 +353,50 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &965584660323305542
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9011791470097645606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d1c4e0b1822b495aa52bc52839ecb30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_BrainParameters:
+    VectorObservationSize: 3
+    NumStackedVectorObservations: 1
+    m_ActionSpec:
+      m_NumContinuousActions: 2
+      BranchSizes: 00000000
+    VectorActionSize: 
+    VectorActionDescriptions: []
+    VectorActionSpaceType: 1
+    hasUpgradedBrainParametersWithActionSpec: 1
+  m_Model: {fileID: 0}
+  m_InferenceDevice: 2
+  m_BehaviorType: 0
+  m_BehaviorName: Platform
+  TeamId: 0
+  m_UseChildSensors: 1
+  m_UseChildActuators: 1
+  m_ObservableAttributeHandling: 0
+--- !u!114 &581467683131000933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9011791470097645606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DecisionPeriod: 5
+  TakeActionsBetweenDecisions: 1
 --- !u!114 &1373913932613343671
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -364,11 +411,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 25
   airborneMovementDilusion: 0.25
+  fallDepth: -2
   stepUpper: {fileID: 3044480291310230597}
   stepLower: {fileID: 612475465040626379}
   stepLowerRayCastDistance: 0.1
   stepUpperRayCastDistance: 0.2
   stepSmooth: 0.05
+  shouldStep: 1
   jumpForce: 10
   maxJumps: 2
   collisionRadiusPadding: 0.1
@@ -378,6 +427,22 @@ MonoBehaviour:
   weaponActiveTime: 0.5
   forceWhenDamaged: 5
   limitedInvulnerabilityTime: 1
+--- !u!114 &4359677745402088481
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9011791470097645606}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21e49ca3ae5555e4fb57eb5e316d06ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentParameters:
+    maxStep: 0
+  hasUpgradedFromAgentParameters: 1
+  MaxStep: 0
 --- !u!1 &9112116879536915508
 GameObject:
   m_ObjectHideFlags: 0

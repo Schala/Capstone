@@ -60,5 +60,5 @@ crashlytics-build.properties
 
 /Assets/TextMesh Pro/
 /Assets/Scenes/SampleScene/
-/Packages/ml-agents*
+/results/
 /venv/

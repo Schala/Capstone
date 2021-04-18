@@ -51,10 +51,11 @@ namespace Capstone.Player
 		[SerializeField] float forceWhenDamaged = 5f;
 		[SerializeField] float limitedInvulnerabilityTime = 1f;
 
+		public Vector3 Movement { get; set; } = Vector3.zero;
+
 		Rigidbody physicsBody = null;
 		Material[] playerMaterials = null;
 		Color[] materialColors = null;
-		Vector3 movement = Vector3.zero;
 		Vector3 lastGroundPosition = Vector3.zero;
 		float damagedDelta = 0f;
 		int jumpCount = 0;
@@ -106,9 +107,9 @@ namespace Capstone.Player
 			if (shouldStep) Climb();
 
 			if (state.HasFlag(PlayerState.Grounded))
-				physicsBody.AddForce(movement * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
+				physicsBody.AddForce(Movement * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
 			else
-				physicsBody.AddForce(movement * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
+				physicsBody.AddForce(Movement * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
 		}
 
 		/// Run the damage logic for our player if not already doing so.
@@ -253,31 +254,60 @@ namespace Capstone.Player
 		{
 			if (++jumpCount >= maxJumps) return;
 
-			if (!state.HasFlag(PlayerState.Grounded))
+			if (IsGrounded)
+				Jump();
+			else
 			{
 				physicsBody.velocity.Set(physicsBody.velocity.x, 0f, physicsBody.velocity.z); // zero out velocity for double (triple?) jumps
 				Jump();
 			}
-
-			if (state.HasFlag(PlayerState.Grounded))
-				Jump();
 		}
 
-		/// Apply force for a jump.
-		void Jump() => physicsBody.velocity += Vector3.up * jumpForce;
+		/// Apply force for a jump. This is public so we can access it from machine learning code.
+		public void Jump() => physicsBody.velocity += Vector3.up * jumpForce;
 
 		/// Called when movement input is started
 		public void OnMoveStarted(InputAction.CallbackContext context)
 		{
-			state |= PlayerState.Moving;
+			IsMoving = true;
 
 			var input = context.ReadValue<Vector2>();
-			movement = Vector3.forward * input.x;
+			Movement = Vector3.forward * input.x;
 
-			if (movement != Vector3.zero) transform.rotation = Quaternion.LookRotation(movement);
+			if (Movement != Vector3.zero) transform.rotation = Quaternion.LookRotation(Movement);
 		}
 
 		/// Called when move input stops.
-		public void OnMoveStopped(InputAction.CallbackContext context) => state &= ~PlayerState.Moving;
+		public void OnMoveStopped(InputAction.CallbackContext context) => IsMoving = false;
+
+		/// <summary>
+		/// Set if we're moving or not.
+		/// </summary>
+		public bool IsMoving
+		{
+			get => state.HasFlag(PlayerState.Moving);
+			set
+			{
+				if (value)
+					state |= PlayerState.Moving;
+				else
+					state &= ~PlayerState.Moving;
+			}
+		}
+
+		/// <summary>
+		/// Set if we're on the ground or not.
+		/// </summary>
+		public bool IsGrounded
+		{
+			get => state.HasFlag(PlayerState.Grounded);
+			set
+			{
+				if (value)
+					state |= PlayerState.Grounded;
+				else
+					state &= ~PlayerState.Grounded;
+			}
+		}
 	}
 }
