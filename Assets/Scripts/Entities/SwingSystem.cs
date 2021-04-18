@@ -28,7 +28,7 @@ namespace Capstone.Entities
 	{
 		[SerializeField] float maxRotation = 0.5f;
 		[SerializeField] float speed = 2f;
-		[SerializeField] Transform[] swings;
+		[SerializeField] Transform[] swings = null;
 		[SerializeField] int batchCount = -1;
 
 		TransformAccessArray transforms;
