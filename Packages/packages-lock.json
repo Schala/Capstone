@@ -78,7 +78,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ml-agents": {
-      "version": "file:C:/Users/admin/AppData/Local/Temp/ml-agents-release_16/com.unity.ml-agents",
+      "version": "file:C:/Users/admin/Documents/GitHub/Capstone/Packages/ml-agents-release_16/com.unity.ml-agents",
       "depth": 0,
       "source": "local",
       "dependencies": {
@@ -91,7 +91,7 @@
       }
     },
     "com.unity.ml-agents.extensions": {
-      "version": "file:C:/Users/admin/AppData/Local/Temp/ml-agents-release_16/com.unity.ml-agents.extensions",
+      "version": "file:C:/Users/admin/Documents/GitHub/Capstone/Packages/ml-agents-release_16/com.unity.ml-agents.extensions",
       "depth": 0,
       "source": "local",
       "dependencies": {
