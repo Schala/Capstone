@@ -26,6 +26,7 @@ namespace Capstone.Player
 		[Header("Movement")]
 		[SerializeField] float moveSpeed = 25f;
 		[SerializeField] float airborneMovementDilusion = 0.25f;
+		[SerializeField] float fallDepth = -2f;
 
 		[Header("Stepping")]
 		[SerializeField] Transform stepUpper = null;
@@ -54,6 +55,7 @@ namespace Capstone.Player
 		Material[] playerMaterials = null;
 		Color[] materialColors = null;
 		Vector3 movement = Vector3.zero;
+		Vector3 lastGroundPosition = Vector3.zero;
 		float damagedDelta = 0f;
 		int jumpCount = 0;
 		PlayerState state = PlayerState.None;
@@ -113,29 +115,44 @@ namespace Capstone.Player
 		public void Damage()
 		{
 			if (state.HasFlag(PlayerState.Damaged)) return;
+			Injured();
+		}
 
-			physicsBody.AddForce(-transform.forward * forceWhenDamaged, ForceMode.Impulse);
+		void Injured()
+		{
 			state |= PlayerState.Damaged;
 			damagedDelta = limitedInvulnerabilityTime;
 			StartCoroutine(DamageEffect());
 		}
 
-		/// Progress our timers and check if we're on the ground.
+		/// Progress our timers, check if we're on the ground, and respawn us at the last grounded position if we fall.
 		private void Update()
 		{
+			// if we're grounded
 			if (Physics.CheckSphere(transform.position, playerCollider.radius - collisionRadiusPadding, groundMask))
 			{
 				state |= PlayerState.Grounded;
 				jumpCount = 0;
+				lastGroundPosition = transform.position - transform.forward;
 			}
 			else
 				state &= ~PlayerState.Grounded;
 
+			// if we fell
+			if (transform.position.y <= fallDepth)
+			{
+				transform.position = lastGroundPosition;
+				physicsBody.velocity = Vector3.zero;
+				Injured();
+			}
+
+			// if we hit a wall
 			if (Physics.Raycast(center.position, center.forward, playerCollider.radius / 2f + wallRayCheckPadding, groundMask))
 				state |= PlayerState.HitWall;
 			else
 				state &= ~PlayerState.HitWall;
 
+			// if we're injured
 			if (state.HasFlag(PlayerState.Damaged))
 			{
 				damagedDelta -= Time.deltaTime;
@@ -144,13 +161,13 @@ namespace Capstone.Player
 			}
 		}
 
-		private void OnDrawGizmos()
+		/*private void OnDrawGizmos()
 		{
 			if (playerCollider == null) return;
 
 			Gizmos.color = Color.blue;
 			Gizmos.DrawWireSphere(transform.position, playerCollider.radius - collisionRadiusPadding);
-		}
+		}*/
 
 		/// Enable input actions.
 		private void OnEnable()
