@@ -34,8 +34,8 @@ namespace Capstone.ML
 		public override void OnActionReceived(ActionBuffers actions)
 		{
 			controller.IsMoving = true;
-			controller.Movement = Vector3.forward * actions.ContinuousActions[0];
-			if (controller.Movement != Vector3.zero) transform.rotation = Quaternion.LookRotation(controller.Movement);
+			controller.Movement = actions.ContinuousActions[0];
+			if (controller.Movement != 0f) transform.rotation = Quaternion.LookRotation(controller.Movement * Vector3.forward);
 		}
 
 		public override void OnEpisodeBegin()

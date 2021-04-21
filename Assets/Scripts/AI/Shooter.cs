@@ -1,3 +1,4 @@
+using Capstone.Entities;
 using System.Collections;
 using UnityEngine;
 

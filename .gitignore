@@ -58,7 +58,9 @@ sysinfo.txt
 # Crashlytics generated file
 crashlytics-build.properties
 
+/Assets/ML-Agents/
 /Assets/TextMesh Pro/
 /Assets/Scenes/SampleScene/
 /results/
 /venv/
+*.fbx

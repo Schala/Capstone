@@ -1,3 +1,4 @@
+using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -18,15 +19,27 @@ namespace Capstone.Player
 		HitWall = 16
 	}
 
+	[Flags]
+	public enum PlayerFlags : byte
+	{
+		None = 0,
+		ShouldStep = 1,
+		OrbitalMovement = 2
+	}
+
 	/// Manages player input, movement and actions
 	[RequireComponent(typeof(Rigidbody))]
 	[RequireComponent(typeof(Material))]
 	public class PlayerController : MonoBehaviour
 	{
+		[SerializeField] float orbitalOffset = 5;
+		[SerializeField] PlayerFlags flags = PlayerFlags.ShouldStep;
+
 		[Header("Movement")]
 		[SerializeField] float moveSpeed = 25f;
 		[SerializeField] float airborneMovementDilusion = 0.25f;
 		[SerializeField] float fallDepth = -2f;
+		[SerializeField] Transform arenaCenter = null;
 
 		[Header("Stepping")]
 		[SerializeField] Transform stepUpper = null;
@@ -34,7 +47,6 @@ namespace Capstone.Player
 		[SerializeField] float stepLowerRayCastDistance = 0.1f;
 		[SerializeField] float stepUpperRayCastDistance = 0.2f;
 		[SerializeField] float stepSmooth = 2f;
-		public bool shouldStep = true;
 
 		[Header("Jumping")]
 		[SerializeField] float jumpForce = 5f;
@@ -51,8 +63,9 @@ namespace Capstone.Player
 		[SerializeField] float forceWhenDamaged = 5f;
 		[SerializeField] float limitedInvulnerabilityTime = 1f;
 
-		public Vector3 Movement { get; set; } = Vector3.zero;
+		public float Movement { get; set; } = 0f;
 
+		CinemachineTransposer transposer = null;
 		Rigidbody physicsBody = null;
 		Material[] playerMaterials = null;
 		Color[] materialColors = null;
@@ -72,6 +85,7 @@ namespace Capstone.Player
 		/// Set up our input actions and gather material info.
 		private void Awake()
 		{
+			transposer = FindObjectOfType<CinemachineTransposer>();
 			physicsBody = GetComponent<Rigidbody>();
 			playerCollider = GetComponent<CapsuleCollider>();
 
@@ -104,12 +118,22 @@ namespace Capstone.Player
 			if (!state.HasFlag(PlayerState.Moving)) return;
 			if (state.HasFlag(PlayerState.HitWall)) return;
 
-			if (shouldStep) Climb();
+			if (ShouldStep) Climb();
 
-			if (state.HasFlag(PlayerState.Grounded))
-				physicsBody.AddForce(Movement * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
+			if (flags.HasFlag(PlayerFlags.OrbitalMovement))
+			{
+				if (state.HasFlag(PlayerState.Grounded))
+					transform.RotateAround(arenaCenter.position, Vector3.up, Movement * moveSpeed * Time.fixedDeltaTime);
+				else
+					transform.RotateAround(arenaCenter.position, Vector3.up, Movement * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime);
+			}
 			else
-				physicsBody.AddForce(Movement * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
+			{
+				if (state.HasFlag(PlayerState.Grounded))
+					physicsBody.AddForce(Movement * Vector3.forward * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
+				else
+					physicsBody.AddForce(Movement * Vector3.forward * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
+			}
 		}
 
 		/// Run the damage logic for our player if not already doing so.
@@ -119,6 +143,9 @@ namespace Capstone.Player
 			Injured();
 		}
 
+		/// <summary>
+		/// Injury logic
+		/// </summary>
 		void Injured()
 		{
 			state |= PlayerState.Damaged;
@@ -272,13 +299,29 @@ namespace Capstone.Player
 			IsMoving = true;
 
 			var input = context.ReadValue<Vector2>();
-			Movement = Vector3.forward * input.x;
+			Movement = input.x;
+			transposer.m_FollowOffset.z = orbitalOffset * input.x;
 
-			if (Movement != Vector3.zero) transform.rotation = Quaternion.LookRotation(Movement);
+			if (Movement != 0f) transform.rotation = Quaternion.LookRotation(Movement * Vector3.forward);
 		}
 
 		/// Called when move input stops.
 		public void OnMoveStopped(InputAction.CallbackContext context) => IsMoving = false;
+
+		/// <summary>
+		/// Should the player step up stairs and over small obstacles? This should be turned off when on inclines and swinging platforms.
+		/// </summary>
+		public bool ShouldStep
+		{
+			get => flags.HasFlag(PlayerFlags.ShouldStep);
+			set
+			{
+				if (value)
+					flags |= PlayerFlags.ShouldStep;
+				else
+					flags &= ~PlayerFlags.ShouldStep;
+			}
+		}
 
 		/// <summary>
 		/// Set if we're moving or not.

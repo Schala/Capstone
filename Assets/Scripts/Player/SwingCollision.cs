@@ -16,7 +16,7 @@ public class SwingCollision : MonoBehaviour
 		if (!other.CompareTag("Player")) return;
 		other.transform.SetParent(swing, true);
 		other.attachedRigidbody.useGravity = false;
-		other.GetComponent<PlayerController>().shouldStep = false;
+		other.GetComponent<PlayerController>().ShouldStep = false;
 	}
 
 	/// <summary>
@@ -36,6 +36,6 @@ public class SwingCollision : MonoBehaviour
 		if (!other.CompareTag("Player")) return;
 		other.transform.SetParent(null, true);
 		other.attachedRigidbody.useGravity = true;
-		other.GetComponent<PlayerController>().shouldStep = true;
+		other.GetComponent<PlayerController>().ShouldStep = true;
 	}
 }
