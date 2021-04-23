@@ -59,7 +59,7 @@ sysinfo.txt
 crashlytics-build.properties
 
 /Assets/ML-Agents/
-/Assets/TextMesh Pro/
+/Assets/Plugins/
 /Assets/Scenes/SampleScene/
 /results/
 /venv/

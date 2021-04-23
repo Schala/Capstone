@@ -1,4 +1,3 @@
-using Cinemachine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,7 +23,7 @@ namespace Capstone.Player
 	{
 		None = 0,
 		ShouldStep = 1,
-		OrbitalMovement = 2
+		InSpline = 2
 	}
 
 	/// Manages player input, movement and actions
@@ -32,7 +31,6 @@ namespace Capstone.Player
 	[RequireComponent(typeof(Material))]
 	public class PlayerController : MonoBehaviour
 	{
-		[SerializeField] float orbitalOffset = 5;
 		[SerializeField] PlayerFlags flags = PlayerFlags.ShouldStep;
 
 		[Header("Movement")]
@@ -65,11 +63,11 @@ namespace Capstone.Player
 
 		public float Movement { get; set; } = 0f;
 
-		CinemachineTransposer transposer = null;
 		Rigidbody physicsBody = null;
 		Material[] playerMaterials = null;
 		Color[] materialColors = null;
 		Vector3 lastGroundPosition = Vector3.zero;
+		Vector3 splinePoint = Vector3.zero;
 		float damagedDelta = 0f;
 		int jumpCount = 0;
 		PlayerState state = PlayerState.None;
@@ -82,10 +80,15 @@ namespace Capstone.Player
 		InputAction moveAction = null;
 		InputAction fireAction = null;
 
+		public Vector3 SplinePoint
+		{
+			get => IsInSpline ? splinePoint : Vector3.zero;
+			set => splinePoint = value;
+		}
+
 		/// Set up our input actions and gather material info.
 		private void Awake()
 		{
-			transposer = FindObjectOfType<CinemachineTransposer>();
 			physicsBody = GetComponent<Rigidbody>();
 			playerCollider = GetComponent<CapsuleCollider>();
 
@@ -120,20 +123,10 @@ namespace Capstone.Player
 
 			if (ShouldStep) Climb();
 
-			if (flags.HasFlag(PlayerFlags.OrbitalMovement))
-			{
-				if (state.HasFlag(PlayerState.Grounded))
-					transform.RotateAround(arenaCenter.position, Vector3.up, Movement * moveSpeed * Time.fixedDeltaTime);
-				else
-					transform.RotateAround(arenaCenter.position, Vector3.up, Movement * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime);
-			}
+			if (state.HasFlag(PlayerState.Grounded))
+				physicsBody.AddForce(Movement * transform.forward * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
 			else
-			{
-				if (state.HasFlag(PlayerState.Grounded))
-					physicsBody.AddForce(Movement * Vector3.forward * moveSpeed * Time.fixedDeltaTime, ForceMode.Impulse);
-				else
-					physicsBody.AddForce(Movement * Vector3.forward * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
-			}
+				physicsBody.AddForce(Movement * transform.forward * moveSpeed * airborneMovementDilusion * Time.fixedDeltaTime, ForceMode.Impulse);
 		}
 
 		/// Run the damage logic for our player if not already doing so.
@@ -300,7 +293,6 @@ namespace Capstone.Player
 
 			var input = context.ReadValue<Vector2>();
 			Movement = input.x;
-			transposer.m_FollowOffset.z = orbitalOffset * input.x;
 
 			if (Movement != 0f) transform.rotation = Quaternion.LookRotation(Movement * Vector3.forward);
 		}
@@ -350,6 +342,18 @@ namespace Capstone.Player
 					state |= PlayerState.Grounded;
 				else
 					state &= ~PlayerState.Grounded;
+			}
+		}
+
+		public bool IsInSpline
+		{
+			get => flags.HasFlag(PlayerFlags.InSpline);
+			set
+			{
+				if (value)
+					flags |= PlayerFlags.InSpline;
+				else
+					flags &= ~PlayerFlags.InSpline;
 			}
 		}
 	}
