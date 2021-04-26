@@ -471,3 +471,54 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b7368ee71534f7c4a897fa5ce039d25b, type: 3}
+--- !u!1 &2044366509
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2044366511}
+  - component: {fileID: 2044366510}
+  m_Layer: 0
+  m_Name: spline test
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2044366510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044366509}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfd771f2d52eb6b47a772da7cf6f36a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  looped: 1
+  points:
+  - {x: -4.126737, y: 6.537304, z: -1.86}
+  - {x: 1.2790464, y: 6.537304, z: -4.732453}
+  - {x: 5.30037, y: 6.537304, z: -1.86}
+  - {x: 3.2790463, y: 2.9119444, z: 0.96633625}
+  startTrigger: {fileID: 0}
+  endTrigger: {fileID: 0}
+--- !u!4 &2044366511
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044366509}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.7209536, y: 6.0573034, z: -1.86}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

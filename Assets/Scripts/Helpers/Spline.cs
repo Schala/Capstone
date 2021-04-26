@@ -37,6 +37,7 @@ namespace Capstone.Helpers
 		public List<SplineAnchor> Anchors => anchors;
 		public List<SplinePoint> Points => points;
 		public bool IsLoop => loop;
+		public event EventHandler OnDirty;
 
 		private void Awake()
 		{
@@ -111,30 +112,35 @@ namespace Capstone.Helpers
 				var anchorIndex = Mathf.FloorToInt(tFull);
 				var tAnchor = tFull - anchorIndex;
 
-				SplineAnchor a, b;
+				if (anchors.Count > 1)
+				{
+					SplineAnchor a, b;
 
-				if (anchorIndex < anchors.Count - 1)
-				{
-					a = anchors[anchorIndex];
-					b = anchors[anchorIndex + 1];
-				}
-				else
-				{
-					// last index, don't link to next one or loop back
-					if (loop)
+					if (anchorIndex < anchors.Count - 1)
 					{
-						a = anchors[anchors.Count - 1];
-						b = anchors[0];
+						a = anchors[anchorIndex];
+						b = anchors[anchorIndex + 1];
 					}
 					else
 					{
-						a = anchors[anchorIndex - 1];
-						b = anchors[anchorIndex];
-						tAnchor = 1f;
+						// last index, don't link to next one or loop back
+						if (loop)
+						{
+							a = anchors[anchors.Count - 1];
+							b = anchors[0];
+						}
+						else
+						{
+							a = anchors[anchorIndex - 1];
+							b = anchors[anchorIndex];
+							tAnchor = 1f;
+						}
 					}
+
+					return transform.position + CubicLerp(a.position, a.handleBPosition, b.handleAPosition, b.position, tAnchor);
 				}
 
-				return transform.position + CubicLerp(a.position, a.handleBPosition, b.handleAPosition, b.position, tAnchor);
+				return transform.position;
 			}
 		}
 
@@ -277,15 +283,28 @@ namespace Capstone.Helpers
 		/// </summary>
 		public void AddAnchor()
 		{
-			if (anchors == null) anchors = new List<SplineAnchor>();
-
-			var lastAnchor = anchors[anchors.Count - 1];
-			anchors.Add(new SplineAnchor
+			if (anchors == null)
 			{
-				position = lastAnchor.position + anchorIncrement,
-				handleAPosition = lastAnchor.handleAPosition + anchorIncrement,
-				handleBPosition = lastAnchor.handleBPosition + anchorIncrement
-			});
+				anchors = new List<SplineAnchor>
+				{
+					new SplineAnchor
+					{
+						position = transform.position,
+						handleAPosition = transform.position + Vector3.right,
+						handleBPosition = transform.position + Vector3.left
+					}
+				};
+			}
+			else
+			{
+				var lastAnchor = anchors[anchors.Count - 1];
+				anchors.Add(new SplineAnchor
+				{
+					position = lastAnchor.position + anchorIncrement,
+					handleAPosition = lastAnchor.handleAPosition + anchorIncrement,
+					handleBPosition = lastAnchor.handleBPosition + anchorIncrement
+				});
+			}
 		}
 
 		/// <summary>
@@ -295,6 +314,39 @@ namespace Capstone.Helpers
 		{
 			if (anchors == null) anchors = new List<SplineAnchor>();
 			anchors.RemoveAt(anchors.Count - 1);
+		}
+
+		/// <summary>
+		/// Set all anchors' Z axes to 0.
+		/// </summary>
+		public void SetAllZ0()
+		{
+			for (int i = 0; i < anchors.Count; i++)
+			{
+				anchors[i].position.z = 0f;
+				anchors[i].handleAPosition.z = 0f;
+				anchors[i].handleBPosition.z = 0f;
+			}
+		}
+
+		/// <summary>
+		/// Set all anchors' Y axes to 0.
+		/// </summary>
+		public void SetAllY0()
+		{
+			for (int i = 0; i < anchors.Count; i++)
+			{
+				anchors[i].position.y = 0f;
+				anchors[i].handleAPosition.y = 0f;
+				anchors[i].handleBPosition.y = 0f;
+			}
+		}
+
+		public void SetDirty()
+		{
+			splineLength = GetSplineLength();
+			UpdatePoints();
+			OnDirty?.Invoke(this, EventArgs.Empty);
 		}
 	}
 }
