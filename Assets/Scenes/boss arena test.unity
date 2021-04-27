@@ -502,10 +502,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   looped: 1
   points:
-  - {x: -4.126737, y: 6.537304, z: -1.86}
-  - {x: 1.2790464, y: 6.537304, z: -4.732453}
-  - {x: 5.30037, y: 6.537304, z: -1.86}
-  - {x: 3.2790463, y: 2.9119444, z: 0.96633625}
+  - Position: {x: 0, y: 3.2822309, z: 10}
+    Length: 0.05073869
+  - Position: {x: 10, y: 5.1239557, z: -0.0000004371139}
+    Length: 0.050306883
+  - Position: {x: -0.0000008742278, y: 6.0573034, z: -10}
+    Length: 0.050720993
+  - Position: {x: -10, y: 6.0573034, z: 0.00000011924881}
+    Length: 0.050313484
   startTrigger: {fileID: 0}
   endTrigger: {fileID: 0}
 --- !u!4 &2044366511
@@ -516,7 +520,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2044366509}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.7209536, y: 6.0573034, z: -1.86}
+  m_LocalPosition: {x: -1.3226753, y: 6.0573034, z: -0.8803406}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
